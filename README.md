@@ -1,4 +1,4 @@
-Single threaded basic challenge scrapper for hitrecord.org website
+## Single threaded basic challenge scrapper for hitrecord.org website
 
 
 start from (0 if first run): [challenge to start from]
