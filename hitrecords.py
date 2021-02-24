@@ -1,0 +1,166 @@
+import datetime
+import requests
+import json
+import pandas as pd
+
+
+class Challenge:
+    def __init__(self, title, interest, created_at, user, contributions_count, comments_count):
+        self.title = title
+        self.interest = interest
+        self.created_at = created_at
+        self.user = user
+        self.contributions_count = contributions_count
+        self.comments_count = comments_count
+
+def stamp_to_string(stamp):
+    return datetime.datetime.utcfromtimestamp(stamp).strftime('%d-%m-%Y')
+
+
+
+def get_challenge_objects_list():
+    challenges = []
+    
+    per = 10
+    start = int(input('start from (0 if first run):\t'))
+    page = start / per
+    skip = start % per
+    
+    url = "https://hitrecord.org/api/web/records?type=challenges_projects&hide_closed=false&sort=latest&page=$PAGE$&per=$PER$"
+    
+
+    total = json.loads(requests.get(url.replace("$PER$", "0")).text)['total']
+    
+    year = 9999
+    stop_year = int(input('stop year:\t'))
+    
+    try:
+        while(year > stop_year):
+            
+            print("all projects + prompts avaiblle:\t" + str(total) + "\nstarting...")   
+            response_json = requests.get(url
+                                         .replace("$PAGE$", str(page))
+                                         .replace("$PER$", str(per))
+                                        ).text
+            
+            challenge_list = json.loads(response_json)['items']
+            for i in challenge_list:
+                
+                if(i['type'] == "Challenge"):
+                    if(skip > 0):
+                        skip -= 1
+                        continue
+                    challenge = Challenge(
+                    i['title'],
+                    i['interest'],
+                    stamp_to_string(i['created_at_i']),
+                    i['user']['username'],
+                    i['contributions_count'],
+                    i['comments_count']
+                    )
+                
+                    challenges.append(challenge)
+                    print( str(len(challenges)) + "\t\tchallenges taken \t" + challenge.created_at)
+                    year = int(challenge.created_at.split('-')[0])
+                    
+                    
+                elif(i['type'] == "Project"):
+                    for challenge in get_project_challenges(i['id']):
+                        if(skip > 0):
+                            skip -= 1
+                            continue
+                        
+                        challenges.append(challenge)
+                        print( str(len(challenges)) + "\t\tchallenges taken \t" + challenge.created_at)
+                        year = int(challenge.created_at.split('-')[0])
+
+            
+            page +=1
+    except KeyboardInterrupt:
+            print("user interrupt, last challenge =\t" + str(len(challenges)))
+            return challenges
+        
+    else:
+        print("all challenges taken!")
+            
+        return challenges
+        
+    
+
+def get_project_challenges(id):
+    url = "https://hitrecord.org/api/web/projects/" + str(id)
+    
+    response_json = requests.get(url).text
+    challenges_json = json.loads(response_json)['challenges']
+    challenge_list = []
+    
+    for challenge_data in challenges_json:
+        challenge_list.append(get_challenge(challenge_data['id']))
+        
+        
+    return(challenge_list)
+    
+    
+
+def get_challenge(id):
+    
+    url = "https://hitrecord.org/api/web/challenges/$ID$".replace("$ID$", str(id))
+    response_json = requests.get(url).text
+    challenge_data = json.loads(response_json)['item']
+
+    challenge = Challenge(
+        challenge_data['title'],
+        challenge_data['interest'],
+        stamp_to_string(challenge_data['created_at_i']),
+        challenge_data['user']['username'],
+        challenge_data['contributions_count'],
+        challenge_data['comments_count']
+        )
+    
+    return challenge
+
+def display_challenge(ch):
+    print(ch.title)
+    print(ch.interest)
+    print(ch.created_at)
+    print(ch.user)
+    print(ch.contributions_count)
+    print(ch.comments_count)
+
+
+
+
+challenges = get_challenge_objects_list()
+
+
+cols = ["title", "interest", "created_at", "user", "contributions_count", "comments_count"]
+df = pd.DataFrame(columns=cols)
+
+i = 0
+
+print("writing data on disk as csv")
+for ch in challenges:
+    df.loc[i] = [ch.title, ch.interest, ch.created_at, ch.user, ch.contributions_count, ch.comments_count]
+    i += 1
+
+df.to_csv ("challenges.csv", index = False, header=True, sep=";")
+
+print("all done! :)")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
