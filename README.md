@@ -1,3 +1,6 @@
+Single threaded basic challenge scrapper for hitrecord.org website
+
+
 start from (0 if first run): [challenge to start from]
 
 stop year: [date you want to stop running]
