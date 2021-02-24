@@ -61,7 +61,7 @@ def get_challenge_objects_list(start):
                 
                     challenges.append(challenge)
                     print( str(len(challenges)) + "\t\tchallenges taken \t" + challenge.created_at)
-                    year = int(challenge.created_at.split('-')[0])
+                    year = int(challenge.created_at.split('-')[2])
                     
                     
                 elif(i['type'] == "Project"):
@@ -72,7 +72,7 @@ def get_challenge_objects_list(start):
                         
                         challenges.append(challenge)
                         print( str(len(challenges)) + "\t\tchallenges taken \t" + challenge.created_at)
-                        year = int(challenge.created_at.split('-')[0])
+                        year = int(challenge.created_at.split('-')[2])
 
             
             page +=1
