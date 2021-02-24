@@ -146,21 +146,3 @@ for ch in challenges:
 df.to_csv ("challenges.csv", index = False, header=True, sep=";")
 
 print("all done! :)")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
