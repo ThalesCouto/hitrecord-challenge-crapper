@@ -35,9 +35,9 @@ def get_challenge_objects_list(start):
     stop_year = int(input('stop year:\t'))
     
     try:
+        print("all projects + prompts avaiblle:\t" + str(total) + "\nstarting...")   
         while(year > stop_year):
-            
-            print("all projects + prompts avaiblle:\t" + str(total) + "\nstarting...")   
+
             response_json = requests.get(url
                                          .replace("$PAGE$", str(page))
                                          .replace("$PER$", str(per))
