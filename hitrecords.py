@@ -18,11 +18,11 @@ def stamp_to_string(stamp):
 
 
 
-def get_challenge_objects_list():
+def get_challenge_objects_list(start):
     challenges = []
     
     per = 10
-    start = int(input('start from (0 if first run):\t'))
+    
     page = start / per
     skip = start % per
     
@@ -129,8 +129,8 @@ def display_challenge(ch):
 
 
 
-
-challenges = get_challenge_objects_list()
+start = int(input('start from (0 if first run):\t'))
+challenges = get_challenge_objects_list(start)
 
 
 cols = ["title", "interest", "created_at", "user", "contributions_count", "comments_count"]
@@ -143,6 +143,6 @@ for ch in challenges:
     df.loc[i] = [ch.title, ch.interest, ch.created_at, ch.user, ch.contributions_count, ch.comments_count]
     i += 1
 
-df.to_csv ("challenges.csv", index = False, header=True, sep=";")
+df.to_csv ("challenges{}.csv".format(str(start)), index = False, header=True, sep=";")
 
 print("all done! :)")
