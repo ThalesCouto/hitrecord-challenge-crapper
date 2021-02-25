@@ -84,8 +84,7 @@ def get_challenge_objects_list(start):
         print("all challenges taken!")
             
         return challenges
-        
-    
+            
 
 def get_project_challenges(id):
     url = "https://hitrecord.org/api/web/projects/" + str(id)
@@ -99,7 +98,6 @@ def get_project_challenges(id):
         
         
     return(challenge_list)
-    
     
 
 def get_challenge(id):
@@ -126,7 +124,6 @@ def display_challenge(ch):
     print(ch.user)
     print(ch.contributions_count)
     print(ch.comments_count)
-
 
 
 start = int(input('start from (0 if first run):\t'))
