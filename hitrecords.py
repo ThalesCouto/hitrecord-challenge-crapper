@@ -3,7 +3,6 @@ import requests
 import json
 import pandas as pd
 
-
 class Challenge:
     def __init__(self, title, interest, created_at, user, contributions_count, comments_count):
         self.title = title
@@ -20,36 +19,54 @@ def stamp_to_string(stamp):
 
 def get_challenge_objects_list(start):
     challenges = []
-    
+    count = 0
     per = 10
     
     page = start / per
     skip = start % per
     
     url = "https://hitrecord.org/api/web/records?type=challenges_projects&hide_closed=false&sort=latest&page=$PAGE$&per=$PER$"
-    
 
     total = json.loads(requests.get(url.replace("$PER$", "0")).text)['total']
+
     
     year = 9999
     stop_year = int(input('stop year:\t'))
-    
     try:
         print("all projects + prompts avaiblle:\t" + str(total) + "\nstarting...")   
         while(year > stop_year):
 
-            response_json = requests.get(url
+           
+            try:
+                response_json = requests.get(url
                                          .replace("$PAGE$", str(page))
                                          .replace("$PER$", str(per))
                                         ).text
-            
-            challenge_list = json.loads(response_json)['items']
+                 
+                challenge_list = json.loads(response_json)['items']
+                
+            except ValueError:
+                print("Decoding JSON has failed at count {} skipping to next".format(count))
+                continue
+                
+            except KeyboardInterrupt:
+                print("user interrupt, count =\t" + str(count))
+                return challenges
+            except Exception as err:
+                print("Erro {}".format(err))
+                continue
+
+                
             for i in challenge_list:
                 
                 if(i['type'] == "Challenge"):
+                    
                     if(skip > 0):
                         skip -= 1
                         continue
+                    
+                    count += 1
+                    
                     challenge = Challenge(
                     i['title'],
                     i['interest'],
@@ -65,23 +82,43 @@ def get_challenge_objects_list(start):
                     
                     
                 elif(i['type'] == "Project"):
-                    for challenge in get_project_challenges(i['id']):
-                        if(skip > 0):
+                    
+                    if(skip > 0):
                             skip -= 1
                             continue
                         
-                        challenges.append(challenge)
-                        print( str(len(challenges)) + "\t\tchallenges taken \t" + challenge.created_at)
-                        year = int(challenge.created_at.split('-')[2])
+                    count += 1
+                        
+                    try:
+                        challenges_by_id = get_project_challenges(i['id'])
+                        
+                        for challenge in challenges_by_id:
+                            
+                            challenges.append(challenge)
+                            print( str(len(challenges)) + "\t\tchallenges taken \t" + challenge.created_at)
+                            year = int(challenge.created_at.split('-')[2])
+                    
+                    except ValueError:
+                        print("Decoding JSON has failed at count {} skipping to next".format(count))
+                        continue
+                    
+                    except KeyboardInterrupt:
+                        print("user interrupt, count =\t" + str(count))
+                        return challenges
+                    
+                    except Exception as err:
+                        print("Erro {}".format(err))
+                        continue
+
 
             
             page +=1
     except KeyboardInterrupt:
-            print("user interrupt, last challenge =\t" + str(len(challenges)))
+            print("user interrupt, count =\t" + str(count-1))
             return challenges
         
     else:
-        print("all challenges taken!")
+        print("all challenges up to {} taken!".format(stop_year))
             
         return challenges
             
