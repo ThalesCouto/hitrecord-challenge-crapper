@@ -109,6 +109,9 @@ def get_challenge_objects_list(start):
                     except Exception as err:
                         print("Erro {}".format(err))
                         continue
+                    
+                if(count >= total - 5):
+                    break
 
 
             
@@ -118,7 +121,7 @@ def get_challenge_objects_list(start):
             return challenges
         
     else:
-        print("all challenges up to {} taken!".format(stop_year))
+        print("all challenges up to {} taken!, count =\t{}".format(stop_year, count))
             
         return challenges
             
