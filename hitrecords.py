@@ -15,8 +15,6 @@ class Challenge:
 def stamp_to_string(stamp):
     return datetime.datetime.utcfromtimestamp(stamp).strftime('%d-%m-%Y')
 
-
-
 def get_challenge_objects_list(start):
     challenges = []
     count = 0
@@ -28,15 +26,13 @@ def get_challenge_objects_list(start):
     url = "https://hitrecord.org/api/web/records?type=challenges_projects&hide_closed=false&sort=latest&page=$PAGE$&per=$PER$"
 
     total = json.loads(requests.get(url.replace("$PER$", "0")).text)['total']
-
     
     year = 9999
     stop_year = int(input('stop year:\t'))
     try:
         print("all projects + prompts avaiblle:\t" + str(total) + "\nstarting...")   
         while(year > stop_year):
-
-           
+            
             try:
                 response_json = requests.get(url
                                          .replace("$PAGE$", str(page))
@@ -56,7 +52,6 @@ def get_challenge_objects_list(start):
                 print("Erro {}".format(err))
                 continue
 
-                
             for i in challenge_list:
                 
                 if(i['type'] == "Challenge"):
@@ -79,7 +74,6 @@ def get_challenge_objects_list(start):
                     challenges.append(challenge)
                     print( str(len(challenges)) + "\t\tchallenges taken \t" + challenge.created_at)
                     year = int(challenge.created_at.split('-')[2])
-                    
                     
                 elif(i['type'] == "Project"):
                     
@@ -113,8 +107,6 @@ def get_challenge_objects_list(start):
                 if(count >= total - 5):
                     break
 
-
-            
             page +=1
     except KeyboardInterrupt:
             print("user interrupt, count =\t" + str(count-1))
